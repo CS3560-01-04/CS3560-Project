@@ -105,15 +105,18 @@ public class mainGUI extends Application {
 		//Putting together the login screen
 		login = new Scene(loginGrid, 400, 300);
 		
+		//Creating a border pane layout for our second scene
 		BorderPane layout2 = new BorderPane();
 		int width = ((int) Screen.getPrimary().getBounds().getWidth()) - 50;
 		int height = ((int) Screen.getPrimary().getBounds().getHeight() - 100);
 		homePage = new Scene(layout2, width, height);
 		
+		//Setting the login page as the first thing seen when program is run, and showing the window
 		window.setScene(login);
 		window.show();
 	}
 	
+	//a program to verify close request from the user
 	private void closeProgram() {
 		boolean answer = ConfirmBox.display("Exit Page", "Are you sure you'd like to close this page?");
 		if(answer)
