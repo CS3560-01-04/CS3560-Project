@@ -1,7 +1,7 @@
 public class Drug {
 
     // declare the following attributes for the Drug class
-    private String id;
+    private int id;
     private String name;
     private String description;
     private int quantity;
