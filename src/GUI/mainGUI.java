@@ -210,7 +210,11 @@ public class mainGUI extends Application {
 		Button addButton = new Button("Add");
 		addButton.setOnAction(e -> addButtonClicked());
 		Button deleteButton = new Button("Delete");
-		deleteButton.setOnAction(e -> deleteButtonClicked());
+		deleteButton.setOnAction(e -> {
+			boolean delete = ConfirmBox.display("Confirm Deletion", "Are you sure you want to delete this product?");
+			if(delete)
+				deleteButtonClicked();
+		});
 		
 		HBox hBox = new HBox();
 		hBox.setPadding(new Insets(10, 10, 10, 10));
@@ -241,7 +245,6 @@ public class mainGUI extends Application {
 	
 	//add button clicked
 	public void addButtonClicked() {
-		Drug drug = new Drug();
 		
 		if((Validator.validation("Integer", drugIDInput.getText())) &&
 		(Validator.validation("Double", drugPriceInput.getText())) &&
@@ -249,6 +252,7 @@ public class mainGUI extends Application {
 		(Validator.validation("Integer", drugExpyearInput.getText())) &&
 		(Validator.validation("Integer", drugExpmonthInput.getText())) &&
 		(Validator.validation("Integer", drugExpdayInput.getText()))) {
+			Drug drug = new Drug();
 			drug.setId(Integer.parseInt(drugIDInput.getText()));
 			drug.setName(drugNameInput.getText());
 			drug.setDescription(drugDescriptionInput.getText());
