@@ -14,7 +14,7 @@ public class Drug {
     // create default constructors for the following attributes
     // default values
     public Drug() {
-        this.id = "";
+        this.id = 0;
         this.name = "";
         this.description = "";
         this.quantity = 0;
