@@ -242,26 +242,38 @@ public class mainGUI extends Application {
 	//add button clicked
 	public void addButtonClicked() {
 		Drug drug = new Drug();
-		drug.setId(drugIDInput.getText());
-		drug.setName(drugNameInput.getText());
-		drug.setDescription(drugDescriptionInput.getText());
-		drug.setPrice(Double.parseDouble(drugPriceInput.getText()));
-		drug.setQuantity(Integer.parseInt(drugQuantityInput.getText()));
-		drug.setSupplier(drugSupplierInput.getText());
-		drug.setExpyear(Integer.parseInt(drugExpyearInput.getText()));
-		drug.setExpmonth(Integer.parseInt(drugExpmonthInput.getText()));
-		drug.setExpday(Integer.parseInt(drugExpdayInput.getText()));
-		table.getItems().add(drug);
 		
-		drugIDInput.clear();
-		drugNameInput.clear();
-		drugDescriptionInput.clear();
-		drugPriceInput.clear();
-		drugQuantityInput.clear();
-		drugSupplierInput.clear();
-		drugExpyearInput.clear();
-		drugExpmonthInput.clear();
-		drugExpdayInput.clear();
+		if((Validator.validation("Integer", drugIDInput.getText())) &&
+		(Validator.validation("Double", drugPriceInput.getText())) &&
+		(Validator.validation("Integer", drugQuantityInput.getText())) &&
+		(Validator.validation("Integer", drugExpyearInput.getText())) &&
+		(Validator.validation("Integer", drugExpmonthInput.getText())) &&
+		(Validator.validation("Integer", drugExpdayInput.getText()))) {
+			drug.setId(Integer.parseInt(drugIDInput.getText()));
+			drug.setName(drugNameInput.getText());
+			drug.setDescription(drugDescriptionInput.getText());
+			drug.setPrice(Double.parseDouble(drugPriceInput.getText()));
+			drug.setQuantity(Integer.parseInt(drugQuantityInput.getText()));
+			drug.setSupplier(drugSupplierInput.getText());
+			drug.setExpyear(Integer.parseInt(drugExpyearInput.getText()));
+			drug.setExpmonth(Integer.parseInt(drugExpmonthInput.getText()));
+			drug.setExpday(Integer.parseInt(drugExpdayInput.getText()));
+			table.getItems().add(drug);
+			drugIDInput.clear();
+			drugNameInput.clear();
+			drugDescriptionInput.clear();
+			drugPriceInput.clear();
+			drugQuantityInput.clear();
+			drugSupplierInput.clear();
+			drugExpyearInput.clear();
+			drugExpmonthInput.clear();
+			drugExpdayInput.clear();
+		}
+		
+		else {
+			AlertBox.display("Error in input", "Sorry but one of the values you inputed was of the wrong type, please try again.", "Try Again");
+		}
+		
 	}
 	
 	//delete button clicked
@@ -275,15 +287,15 @@ public class mainGUI extends Application {
 	
 	public ObservableList<Drug> getProduct(){
 		ObservableList<Drug> drugs = FXCollections.observableArrayList();
-		drugs.add(new Drug("ID_4598", "Albuterol Sulfate", "Bronchospasm treatment; Beta2 Agonists",
+		drugs.add(new Drug(4598, "Albuterol Sulfate", "Bronchospasm treatment; Beta2 Agonists",
 				200, 50.68, "CVS", 2026, 4, 15));
-		drugs.add(new Drug("ID_1556", "Adderall", "central nervous system stimulant",
+		drugs.add(new Drug(1556, "Adderall", "central nervous system stimulant",
 				450, 187.59, "CVS", 2026, 5, 20));
-		drugs.add(new Drug("ID_7855", "Indocin", "nonsteroidal anti-inflammatory drug",
+		drugs.add(new Drug(7855, "Indocin", "nonsteroidal anti-inflammatory drug",
 				70, 363.60, "CVS", 2026, 6, 30));
-		drugs.add(new Drug("ID_1453", "Prozac", "Antidepressant; major depressive disorder treatment",
+		drugs.add(new Drug(1453, "Prozac", "Antidepressant; major depressive disorder treatment",
 				95, 620.37, "CVS", 2026, 8, 19));
-		drugs.add(new Drug("ID_5468", "Tylenol", "over-the-counter pain relief; Analgesics",
+		drugs.add(new Drug(5468, "Tylenol", "over-the-counter pain relief; Analgesics",
 				250, 11.99, "CVS", 2026, 7, 17));
 		return drugs;
 	}
