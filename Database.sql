@@ -28,15 +28,14 @@ INSERT INTO CustomerInfo VALUES ('2','Johannes Wenstworth','1234567890','mockmai
 INSERT INTO CustomerInfo VALUES ('3','Marlene Joanes','1234567890','mockmail@gmail.com');
 INSERT INTO CustomerInfo VALUES ('4','Durk Wellington','1234567890','mockmail@gmail.com');
 INSERT INTO CustomerInfo VALUES ('5','Tina Waltz','1234567890','mockmail@gmail.com');
-USE Inventory;
+
 CREATE TABLE `Supplier` (
   `SupplierID` int(11) NOT NULL AUTO_INCREMENT,
   `SupplierName` varchar(50) NOT NULL,
-  `merchandice`varchar(80),
-  `Quantity` int(11) NOT NULL,
-  `Price` decimal(4,2) NOT NULL,
-  
+  `EmailAdd`varchar(80),
+  `PhoneNum` int(11) NOT NULL,
+
   PRIMARY KEY (`SupplierID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-INSERT INTO Supplier VALUES ('1','CVS','tylenol','25', '3.99');
+INSERT INTO Supplier VALUES ('1','CVS','CVS@gmail.com','1234567899');
 
