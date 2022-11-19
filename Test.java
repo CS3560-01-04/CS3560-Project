@@ -12,10 +12,10 @@ public class Test
 	public static void main(String[] args)
 	{
 		Test pro = new Test();
-		pro.createConenction();
+		pro.createConnection();
 	}
-	
-	void createConenction()
+	//I spelt connection wrong before this commit
+	void createConnection()
 	{
 		try
 		{
