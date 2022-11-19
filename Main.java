@@ -306,7 +306,6 @@ public class Main extends Application {
 		int[] intValues = new int[5];
 		String[] sValues = new String[3];
 		double price = 0.0;
-		boolean loopbreak = false;
 		
 		for(int i = 0; i < 5; i++)
 		{
