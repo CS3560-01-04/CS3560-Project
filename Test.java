@@ -25,10 +25,19 @@ public class Test
 			//password: bruh
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
 			Statement stmt = con.createStatement();
+			//fetch data from SQL
 			ResultSet rs = stmt.executeQuery("SELECT * FROM product WHERE Description = 'Pain Reliever'");
 			while(rs.next())
 			{
 				String name = rs.getString("Description");
+				System.out.println(name);
+			}
+			//change data in SQL
+			stmt.executeUpdate("UPDATE product SET ProductID = '4200' WHERE ProductName = 'advil'");
+			ResultSet re = stmt.executeQuery("SELECT ProductID FROM product WHERE ProductName = 'advil'");
+			while(re.next())
+			{
+				int name = re.getInt("ProductID");
 				System.out.println(name);
 			}
 			
