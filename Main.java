@@ -310,15 +310,15 @@ public class Main extends Application {
 		for(int i = 0; i < 5; i++)
 		{
 			rowCount++;
-			intValues[0] = Integer.parseInt(pro.createConnection("ProductID", rowCount));
-			sValues[0] = pro.createConnection("ProductName", rowCount);
-			sValues[1] = pro.createConnection("Description", rowCount);
-			intValues[1] = Integer.parseInt(pro.createConnection("InStock", rowCount));
-			price = Double.parseDouble(pro.createConnection("Price", rowCount));
-			sValues[2] = pro.createConnection("Supplier", rowCount);
-			intValues[2] = Integer.parseInt(pro.createConnection("Exp_Year", rowCount));
-			intValues[3] = Integer.parseInt(pro.createConnection("Exp_Month", rowCount));
-			intValues[4] = Integer.parseInt(pro.createConnection("Exp_Day", rowCount));
+			intValues[0] = Integer.parseInt(pro.createConnection("product_id", rowCount));
+			sValues[0] = pro.createConnection("product_name", rowCount);
+			sValues[1] = pro.createConnection("descript", rowCount);
+			intValues[1] = Integer.parseInt(pro.createConnection("quantity", rowCount));
+			price = Double.parseDouble(pro.createConnection("price", rowCount));
+			sValues[2] = pro.createConnection("supplier", rowCount);
+			intValues[2] = Integer.parseInt(pro.createConnection("exp_year", rowCount));
+			intValues[3] = Integer.parseInt(pro.createConnection("exp_month", rowCount));
+			intValues[4] = Integer.parseInt(pro.createConnection("exp_day", rowCount));
 			
 			drugs.add(new Drug(intValues[0], sValues[0], sValues[1],
 					intValues[1], price, sValues[2], intValues[2], 
