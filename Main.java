@@ -348,8 +348,8 @@ public class Main extends Application {
 			//password: bruh
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM product ORDER BY row_num");
-			rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE row_num = " + row);
+			ResultSet rs = stmt.executeQuery("SELECT * FROM product ORDER BY product_id");
+			rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE product_id = " + row);
 			while(rs.next())
 			{
 				String index = rs.getString(column);
