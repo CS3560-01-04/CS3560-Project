@@ -257,12 +257,6 @@ public class Main extends Application {
 				deleteButtonClicked();
 		});
 		
-		
-		
-		
-		
-		
-		
 		ChoiceBox<String> searchDropDown = new ChoiceBox<String>();
 		searchDropDown.getItems().addAll("Product ID", "Product Name", "Description");
 		searchDropDown.setValue("ProductID");
