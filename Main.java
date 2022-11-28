@@ -8,6 +8,7 @@ import javafx.collections.*;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.*;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.*;
@@ -19,6 +20,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +30,7 @@ public class Main extends Application {
 	Stage window;
 	Scene login, homePage;
 	Button submitBtn;
-	TableView<Drug> table;
+	TableView<Drug> table = new TableView<>();
 	TextField drugIDInput;
 	TextField drugNameInput;
 	TextField drugDescriptionInput;
@@ -38,6 +40,7 @@ public class Main extends Application {
 	TextField drugExpyearInput;
 	TextField drugExpmonthInput;
 	TextField drugExpdayInput;
+	private ObservableList<Drug> drugs;
 	
 	
 	
@@ -131,32 +134,6 @@ public class Main extends Application {
 		//Putting together the login screen
 		login = new Scene(loginGrid, 400, 300);
 		
-		TableView<Drug> table = new TableView<Drug>();
-		ObservableList<Drug> drugs = FXCollections.observableArrayList();
-		Main pro = new Main();
-		int rowCount = 0;
-		int[] intValues = new int[5];
-		String[] sValues = new String[3];
-		double price = 0.0;
-		
-		for(int i = 0; i < 5; i++)
-		{
-			rowCount++;
-			intValues[0] = Integer.parseInt(pro.createConnection("product_id", rowCount));
-			sValues[0] = pro.createConnection("product_name", rowCount);
-			sValues[1] = pro.createConnection("descript", rowCount);
-			intValues[1] = Integer.parseInt(pro.createConnection("quantity", rowCount));
-			price = Double.parseDouble(pro.createConnection("price", rowCount));
-			sValues[2] = pro.createConnection("supplier", rowCount);
-			intValues[2] = Integer.parseInt(pro.createConnection("exp_year", rowCount));
-			intValues[3] = Integer.parseInt(pro.createConnection("exp_month", rowCount));
-			intValues[4] = Integer.parseInt(pro.createConnection("exp_day", rowCount));
-			
-			drugs.add(new Drug(intValues[0], sValues[0], sValues[1],
-					intValues[1], price, sValues[2], intValues[2], 
-					intValues[3], intValues[4]));
-		}
-		
 		//ID column
 		TableColumn<Drug, String> IDColumn = new TableColumn<>("ID");
 		IDColumn.setMinWidth(65);
@@ -246,31 +223,50 @@ public class Main extends Application {
 		drugExpdayInput = new TextField();
 		drugExpdayInput.setPromptText("Exp day of drug");
 		drugExpdayInput.setMaxWidth(200);
-		
-		//Buttons to add or delete drugs
-		Button addButton = new Button("Add");
-		addButton.setOnAction(e -> addButtonClicked());
-		Button deleteButton = new Button("Delete");
-		deleteButton.setOnAction(e -> {
-			boolean delete = ConfirmBox.display("Confirm Deletion", "Are you sure you want to delete this product?");
-			if(delete)
-				deleteButtonClicked();
-		});
-		
+
 		ChoiceBox<String> searchDropDown = new ChoiceBox<String>();
 		searchDropDown.getItems().addAll("Product ID", "Product Name", "Description");
 		searchDropDown.setValue("ProductID");
 		
-		FilteredList<Drug> filteredList = new FilteredList<Drug>(drugs, p -> true);//Pass the data to a filtered list
-		table.setItems(filteredList);//Set the table's items using the filtered list
-        table.getColumns().addAll(IDColumn, nameColumn, descriptionColumn, priceColumn, quantityColumn,
-				supplierColumn, expyearColumn, expmonthColumn, expdayColumn);
-        
 		TextField searchInput = new TextField();
 		searchInput.setPromptText("Search for product");
 		searchInput.setFocusTraversable(false);
 		searchInput.setMinWidth(Screen.getPrimary().getBounds().getWidth() - 500);
 		
+		ObservableList<Drug> drugs = FXCollections.observableArrayList();
+		Main pro = new Main();
+		int rowCount = 0;
+		int[] intValues = new int[5];
+		String[] sValues = new String[3];
+		double price = 0.0;
+		
+		for(int i = 0; i < Integer.parseInt(pro.fetchData("COUNT(*)", -1)); i++)
+		{
+			rowCount++;
+			intValues[0] = Integer.parseInt(pro.fetchData("product_id", rowCount));
+			sValues[0] = pro.fetchData("product_name", rowCount);
+			sValues[1] = pro.fetchData("descript", rowCount);
+			intValues[1] = Integer.parseInt(pro.fetchData("quantity", rowCount));
+			price = Double.parseDouble(pro.fetchData("price", rowCount));
+			sValues[2] = pro.fetchData("supplier", rowCount);
+			intValues[2] = Integer.parseInt(pro.fetchData("exp_year", rowCount));
+			intValues[3] = Integer.parseInt(pro.fetchData("exp_month", rowCount));
+			intValues[4] = Integer.parseInt(pro.fetchData("exp_day", rowCount));
+			
+			drugs.add(new Drug(intValues[0], sValues[0], sValues[1],
+					intValues[1], price, sValues[2], intValues[2], 
+					intValues[3], intValues[4]));
+		}
+		
+		
+		FilteredList<Drug> filteredList = new FilteredList<>(drugs);//Pass the data to a filtered list
+		SortedList<Drug> sortedList = new SortedList<Drug>(filteredList);
+		table.setEditable(true);
+		//table.setItems(drugs);
+		table.setItems(filteredList);//Set the table's items using the filtered list
+        table.getColumns().addAll(IDColumn, nameColumn, descriptionColumn, priceColumn, quantityColumn,
+				supplierColumn, expyearColumn, expmonthColumn, expdayColumn);
+        
 		searchInput.textProperty().addListener((obs, oldValue, newValue) -> {
             filteredList.setPredicate(Drug -> {
             	
@@ -298,8 +294,51 @@ public class Main extends Application {
             	});
             });
             
+		//Buttons to add or delete drugs
+				Button addButton = new Button("Add");
+				addButton.setOnAction(e -> {
+					if((Validator.validation("Integer", drugIDInput.getText())) &&
+							(Validator.validation("Double", drugPriceInput.getText())) &&
+							(Validator.validation("Integer", drugQuantityInput.getText())) &&
+							(Validator.validation("Integer", drugExpyearInput.getText())) &&
+							(Validator.validation("Integer", drugExpmonthInput.getText())) &&
+							(Validator.validation("Integer", drugExpdayInput.getText()))) {
+								drugs.add(new Drug(Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(),
+										drugDescriptionInput.getText(), Integer.parseInt(drugQuantityInput.getText()), 
+										Double.parseDouble(drugPriceInput.getText()), drugSupplierInput.getText(),
+										Integer.parseInt(drugExpyearInput.getText()), Integer.parseInt(drugExpmonthInput.getText()),
+										Integer.parseInt(drugExpdayInput.getText())));
+								
+								/*
+								Main pro = new Main();
+								pro.addData(Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(), drugDescriptionInput.getText(),
+										Double.parseDouble(drugPriceInput.getText()), Integer.parseInt(drugQuantityInput.getText()),
+										drugSupplierInput.getText(), Integer.parseInt(drugExpyearInput.getText()),
+										Integer.parseInt(drugExpmonthInput.getText()), Integer.parseInt(drugExpdayInput.getText()));
+								*/
+								drugIDInput.clear();
+								drugNameInput.clear();
+								drugDescriptionInput.clear();
+								drugPriceInput.clear();
+								drugQuantityInput.clear();
+								drugSupplierInput.clear();
+								drugExpyearInput.clear();
+								drugExpmonthInput.clear();
+								drugExpdayInput.clear();
+							}
+							
+							else {
+								AlertBox.display("Error in input", "Sorry but one of the values you inputed was of the wrong type, please try again.", "Try Again");
+							}
+				});
+				Button deleteButton = new Button("Delete");
+				deleteButton.setOnAction(e -> {
+					boolean delete = ConfirmBox.display("Confirm Deletion", "Are you sure you want to delete this product?");
+					if(delete)
+						table.getSelectionModel().getSelectedItems().forEach(drugs::remove);
+				});
 		
-		HBox topSearch = new HBox(20);
+		HBox topSearch = new HBox(5);
 		topSearch.setPadding(new Insets(5, 5, 5, 5));
 		topSearch.getChildren().addAll(searchDropDown, searchInput);
 				
@@ -308,7 +347,6 @@ public class Main extends Application {
 		hBox.setSpacing(10);
 		hBox.getChildren().addAll(drugIDInput, drugNameInput, drugDescriptionInput, drugPriceInput, drugQuantityInput,
 				drugSupplierInput, drugExpyearInput, drugExpmonthInput, drugExpdayInput, addButton, deleteButton);
-		
 		
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(table);
@@ -327,52 +365,6 @@ public class Main extends Application {
 		window.show();
 	}
 	
-	//add button clicked
-	public void addButtonClicked() {
-		
-		if((Validator.validation("Integer", drugIDInput.getText())) &&
-		(Validator.validation("Double", drugPriceInput.getText())) &&
-		(Validator.validation("Integer", drugQuantityInput.getText())) &&
-		(Validator.validation("Integer", drugExpyearInput.getText())) &&
-		(Validator.validation("Integer", drugExpmonthInput.getText())) &&
-		(Validator.validation("Integer", drugExpdayInput.getText()))) {
-			Drug drug = new Drug();
-			drug.setId(Integer.parseInt(drugIDInput.getText()));
-			drug.setName(drugNameInput.getText());
-			drug.setDescription(drugDescriptionInput.getText());
-			drug.setPrice(Double.parseDouble(drugPriceInput.getText()));
-			drug.setQuantity(Integer.parseInt(drugQuantityInput.getText()));
-			drug.setSupplier(drugSupplierInput.getText());
-			drug.setExpyear(Integer.parseInt(drugExpyearInput.getText()));
-			drug.setExpmonth(Integer.parseInt(drugExpmonthInput.getText()));
-			drug.setExpday(Integer.parseInt(drugExpdayInput.getText()));
-			table.getItems().add(drug);
-			drugIDInput.clear();
-			drugNameInput.clear();
-			drugDescriptionInput.clear();
-			drugPriceInput.clear();
-			drugQuantityInput.clear();
-			drugSupplierInput.clear();
-			drugExpyearInput.clear();
-			drugExpmonthInput.clear();
-			drugExpdayInput.clear();
-		}
-		
-		else {
-			AlertBox.display("Error in input", "Sorry but one of the values you inputed was of the wrong type, please try again.", "Try Again");
-		}
-		
-	}
-	
-	//delete button clicked
-	public void deleteButtonClicked() {
-		ObservableList<Drug> drugSelected, allDrugs;
-		allDrugs = table.getItems();
-		drugSelected = table.getSelectionModel().getSelectedItems();
-		
-		drugSelected.forEach(allDrugs::remove);
-	}
-	
 	//a program to verify close request from the user
 	private void closeProgram() {
 		boolean answer = ConfirmBox.display("Exit Page", "Are you sure you'd like to close this page?");
@@ -380,7 +372,7 @@ public class Main extends Application {
 			window.close();
 	}
 	
-	String createConnection(String column, int row)
+	String fetchData(String column, int row)
 	{
 		try
 		{
@@ -391,7 +383,12 @@ public class Main extends Application {
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM product ORDER BY product_id");
-			rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE product_id = " + row);
+			
+			
+			if(column.equals("COUNT(*)") && row == -1) //if row = -1, count amount of rows
+				rs = stmt.executeQuery("SELECT COUNT(*) FROM product;");
+			else
+				rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE product_id = " + row);
 			while(rs.next())
 			{
 				String index = rs.getString(column);
@@ -408,4 +405,54 @@ public class Main extends Application {
 		}
 		return null;
 	}
+	
+	void addData(int id, String name, String desc, double price, int quantity, String supplier, int year, int month, int day)
+	{
+		try
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//sql url: jdbc:mysql://localhost:3306/cs3560
+			//user name: root
+			//password: bruh
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("INSERT INTO product VALUES(" + id + ", '" + name + "', '" + desc +"', "
+					+ price + ", " + quantity + ", '" + supplier + "', " + year + ", " + month + ", " + day + ");");
+		} 
+		catch (ClassNotFoundException ex)
+		{
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		catch (SQLException ex)
+		{
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+	
+	
+	
+	/*
+	void deleteData()
+	{
+		try
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//sql url: jdbc:mysql://localhost:3306/cs3560
+			//user name: root
+			//password: bruh
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("INSERT INTO product VALUES(" + id + ", '" + name + "', '" + desc +"', "
+					+ price + ", " + quantity + ", '" + supplier + "', " + year + ", " + month + ", " + day + ");");
+		} 
+		catch (ClassNotFoundException ex)
+		{
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		catch (SQLException ex)
+		{
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+	*/
 }
