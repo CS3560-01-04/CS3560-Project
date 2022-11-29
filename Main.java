@@ -240,18 +240,21 @@ public class Main extends Application {
 		String[] sValues = new String[3];
 		double price = 0.0;
 		
-		for(int i = 0; i < Integer.parseInt(pro.fetchData("COUNT(*)", -1)); i++)
+		for(int i = 0; i < Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)); i++)
 		{
 			rowCount++;
-			intValues[0] = Integer.parseInt(pro.fetchData("product_id", rowCount));
-			sValues[0] = pro.fetchData("product_name", rowCount);
-			sValues[1] = pro.fetchData("descript", rowCount);
-			intValues[1] = Integer.parseInt(pro.fetchData("quantity", rowCount));
-			price = Double.parseDouble(pro.fetchData("price", rowCount));
-			sValues[2] = pro.fetchData("supplier", rowCount);
-			intValues[2] = Integer.parseInt(pro.fetchData("exp_year", rowCount));
-			intValues[3] = Integer.parseInt(pro.fetchData("exp_month", rowCount));
-			intValues[4] = Integer.parseInt(pro.fetchData("exp_day", rowCount));
+			if(rowCount == Integer.parseInt(pro.fetchData("row_num", rowCount, 0)))
+			{
+				intValues[0] = Integer.parseInt(pro.fetchData("product_id", rowCount, 0));
+				sValues[0] = pro.fetchData("product_name", rowCount, 0);
+				sValues[1] = pro.fetchData("descript", rowCount, 0);
+				intValues[1] = Integer.parseInt(pro.fetchData("quantity", rowCount, 0));
+				price = Double.parseDouble(pro.fetchData("price", rowCount, 0));
+				sValues[2] = pro.fetchData("supplier", rowCount, 0);
+				intValues[2] = Integer.parseInt(pro.fetchData("exp_year", rowCount, 0));
+				intValues[3] = Integer.parseInt(pro.fetchData("exp_month", rowCount, 0));
+				intValues[4] = Integer.parseInt(pro.fetchData("exp_day", rowCount, 0));
+			}
 			
 			drugs.add(new Drug(intValues[0], sValues[0], sValues[1],
 					intValues[1], price, sValues[2], intValues[2], 
@@ -309,13 +312,12 @@ public class Main extends Application {
 										Integer.parseInt(drugExpyearInput.getText()), Integer.parseInt(drugExpmonthInput.getText()),
 										Integer.parseInt(drugExpdayInput.getText())));
 								
-								/*
-								Main pro = new Main();
-								pro.addData(Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(), drugDescriptionInput.getText(),
+								Main add = new Main();
+								add.addData(Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)) + 1, Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(), drugDescriptionInput.getText(),
 										Double.parseDouble(drugPriceInput.getText()), Integer.parseInt(drugQuantityInput.getText()),
 										drugSupplierInput.getText(), Integer.parseInt(drugExpyearInput.getText()),
 										Integer.parseInt(drugExpmonthInput.getText()), Integer.parseInt(drugExpdayInput.getText()));
-								*/
+								
 								drugIDInput.clear();
 								drugNameInput.clear();
 								drugDescriptionInput.clear();
@@ -335,7 +337,13 @@ public class Main extends Application {
 				deleteButton.setOnAction(e -> {
 					boolean delete = ConfirmBox.display("Confirm Deletion", "Are you sure you want to delete this product?");
 					if(delete)
+					{
+						Main remove = new Main();
+						remove.deleteData(Integer.parseInt(pro.fetchData("row_num", -2, table.getSelectionModel().getSelectedItem().getId())));
 						table.getSelectionModel().getSelectedItems().forEach(drugs::remove);
+						
+					}
+						
 				});
 		
 		HBox topSearch = new HBox(5);
@@ -372,7 +380,7 @@ public class Main extends Application {
 			window.close();
 	}
 	
-	String fetchData(String column, int row)
+	String fetchData(String column, int row, int id)
 	{
 		try
 		{
@@ -382,13 +390,17 @@ public class Main extends Application {
 			//password: bruh
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM product ORDER BY product_id");
+			stmt.executeUpdate("USE cs3560;");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM product ORDER BY row_num");
 			
 			
 			if(column.equals("COUNT(*)") && row == -1) //if row = -1, count amount of rows
 				rs = stmt.executeQuery("SELECT COUNT(*) FROM product;");
+			else if(column.equals("row_num") && row == -2)
+				rs = stmt.executeQuery("SELECT row_num FROM product WHERE product_id = " + id);
 			else
-				rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE product_id = " + row);
+				rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE row_num = " + row);
+			
 			while(rs.next())
 			{
 				String index = rs.getString(column);
@@ -403,10 +415,11 @@ public class Main extends Application {
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		
 		return null;
 	}
 	
-	void addData(int id, String name, String desc, double price, int quantity, String supplier, int year, int month, int day)
+	void addData(int row, int id, String name, String desc, double price, int quantity, String supplier, int year, int month, int day)
 	{
 		try
 		{
@@ -416,9 +429,11 @@ public class Main extends Application {
 			//password: bruh
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("INSERT INTO product VALUES(" + id + ", '" + name + "', '" + desc +"', "
+			
+			stmt.executeUpdate("INSERT INTO product VALUES(" + row +", " + id + ", '" + name + "', '" + desc +"', "
 					+ price + ", " + quantity + ", '" + supplier + "', " + year + ", " + month + ", " + day + ");");
-		} 
+					
+		}
 		catch (ClassNotFoundException ex)
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -429,10 +444,7 @@ public class Main extends Application {
 		}
 	}
 	
-	
-	
-	/*
-	void deleteData()
+	void deleteData(int row)
 	{
 		try
 		{
@@ -442,8 +454,10 @@ public class Main extends Application {
 			//password: bruh
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cs3560", "root", "bruh");
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("INSERT INTO product VALUES(" + id + ", '" + name + "', '" + desc +"', "
-					+ price + ", " + quantity + ", '" + supplier + "', " + year + ", " + month + ", " + day + ");");
+			stmt.executeUpdate("DELETE FROM product WHERE row_num = " + row);
+			Main remove = new Main();
+			for(int i = row; i < Integer.parseInt(remove.fetchData("COUNT(*)", -1, 0) + 1); i++)
+				stmt.executeUpdate("UPDATE product SET row_num = '" + (i) +"' WHERE row_num = '" + (i+1) + "';");
 		} 
 		catch (ClassNotFoundException ex)
 		{
@@ -454,5 +468,4 @@ public class Main extends Application {
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	*/
 }
