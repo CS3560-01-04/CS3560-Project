@@ -3,8 +3,8 @@ CREATE DATABASE sql_customer;
 USE sql_customer;
 
 CREATE TABLE customer_info (
-	customer_id INT (6) NOT NULL AUTO_INCREMENT,
-    row_num INT (10) NOT NULL,
+	row_num INT (10) NOT NULL,
+    customer_id INT (6) NOT NULL AUTO_INCREMENT,
 	first_name VARCHAR (50) NOT NULL,
 	last_name VARCHAR (50) NOT NULL,
 	customer_email VARCHAR (50) NOT NULL,

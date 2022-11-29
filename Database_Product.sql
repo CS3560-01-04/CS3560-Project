@@ -3,8 +3,8 @@ CREATE DATABASE sql_product;
 USE sql_product;
 
 CREATE TABLE product_item (
-	product_id INT (6) NOT NULL AUTO_INCREMENT,
-    row_num INT (10) NOT NULL,
+	row_num INT (10) NOT NULL,
+    product_id INT (6) NOT NULL AUTO_INCREMENT,
     product_name VARCHAR (50) NOT NULL,
     descript VARCHAR (50),
     price DECIMAL (5,2) NOT NULL,

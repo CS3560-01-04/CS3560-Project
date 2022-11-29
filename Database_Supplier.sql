@@ -3,8 +3,8 @@ CREATE DATABASE sql_supplier;
 USE sql_supplier;
 
 CREATE TABLE supplier_info (
-	supplier_id INT (6) NOT NULL AUTO_INCREMENT,
-    row_num INT (10) NOT NULL,
+	row_num INT (10) NOT NULL,
+    supplier_id INT (6) NOT NULL AUTO_INCREMENT,
 	supplier_name VARCHAR (50) NOT NULL,
 	supplier_email VARCHAR (50) NOT NULL,
 	supplier_phonenum VARCHAR(50) NOT NULL,
