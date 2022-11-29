@@ -281,7 +281,7 @@ public class Main extends Application {
             	switch (searchDropDown.getValue())//Switch on choiceBox value
                 {
                     case "ProductID":
-                    	if(String.valueOf(Drug.getId()).indexOf(lowerCase) !=-1)
+                    	if(String.valueOf(Drug.getId()).indexOf(newValue) !=-1)
                     		return true;
                         break;
                     case "Product Name":
@@ -298,40 +298,40 @@ public class Main extends Application {
             });
             
 		//Buttons to add or delete drugs
-				Button addButton = new Button("Add");
-				addButton.setOnAction(e -> {
-					if((Validator.validation("Integer", drugIDInput.getText())) &&
-							(Validator.validation("Double", drugPriceInput.getText())) &&
-							(Validator.validation("Integer", drugQuantityInput.getText())) &&
-							(Validator.validation("Integer", drugExpyearInput.getText())) &&
-							(Validator.validation("Integer", drugExpmonthInput.getText())) &&
-							(Validator.validation("Integer", drugExpdayInput.getText()))) {
-								drugs.add(new Drug(Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(),
-										drugDescriptionInput.getText(), Integer.parseInt(drugQuantityInput.getText()), 
-										Double.parseDouble(drugPriceInput.getText()), drugSupplierInput.getText(),
-										Integer.parseInt(drugExpyearInput.getText()), Integer.parseInt(drugExpmonthInput.getText()),
-										Integer.parseInt(drugExpdayInput.getText())));
-								
-								Main add = new Main();
-								add.addData(Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)) + 1, Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(), drugDescriptionInput.getText(),
-										Double.parseDouble(drugPriceInput.getText()), Integer.parseInt(drugQuantityInput.getText()),
-										drugSupplierInput.getText(), Integer.parseInt(drugExpyearInput.getText()),
-										Integer.parseInt(drugExpmonthInput.getText()), Integer.parseInt(drugExpdayInput.getText()));
-								
-								drugIDInput.clear();
-								drugNameInput.clear();
-								drugDescriptionInput.clear();
-								drugPriceInput.clear();
-								drugQuantityInput.clear();
-								drugSupplierInput.clear();
-								drugExpyearInput.clear();
-								drugExpmonthInput.clear();
-								drugExpdayInput.clear();
-							}
-							
-							else {
-								AlertBox.display("Error in input", "Sorry but one of the values you inputed was of the wrong type, please try again.", "Try Again");
-							}
+		Button addButton = new Button("Add");
+		addButton.setOnAction(e -> {
+			if((Validator.validation("Integer", drugIDInput.getText())) &&
+					(Validator.validation("Double", drugPriceInput.getText())) &&
+					(Validator.validation("Integer", drugQuantityInput.getText())) &&
+					(Validator.validation("Integer", drugExpyearInput.getText())) &&
+					(Validator.validation("Integer", drugExpmonthInput.getText())) &&
+					(Validator.validation("Integer", drugExpdayInput.getText()))) {
+						drugs.add(new Drug(Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(),
+								drugDescriptionInput.getText(), Integer.parseInt(drugQuantityInput.getText()), 
+								Double.parseDouble(drugPriceInput.getText()), drugSupplierInput.getText(),
+								Integer.parseInt(drugExpyearInput.getText()), Integer.parseInt(drugExpmonthInput.getText()),
+								Integer.parseInt(drugExpdayInput.getText())));
+						
+						Main add = new Main();
+						add.addData(Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)) + 1, Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(), drugDescriptionInput.getText(),
+								Double.parseDouble(drugPriceInput.getText()), Integer.parseInt(drugQuantityInput.getText()),
+								drugSupplierInput.getText(), Integer.parseInt(drugExpyearInput.getText()),
+								Integer.parseInt(drugExpmonthInput.getText()), Integer.parseInt(drugExpdayInput.getText()));
+						
+						drugIDInput.clear();
+						drugNameInput.clear();
+						drugDescriptionInput.clear();
+						drugPriceInput.clear();
+						drugQuantityInput.clear();
+						drugSupplierInput.clear();
+						drugExpyearInput.clear();
+						drugExpmonthInput.clear();
+						drugExpdayInput.clear();
+					}
+					
+					else {
+						AlertBox.display("Error in input", "Sorry but one of the values you inputed was of the wrong type, please try again.", "Try Again");
+					}
 				});
 				Button deleteButton = new Button("Delete");
 				deleteButton.setOnAction(e -> {
@@ -346,9 +346,37 @@ public class Main extends Application {
 						
 				});
 		
+		Button refresh = new Button("Refresh");
+		refresh.setOnAction(e -> {
+			drugs.removeAll(drugs);
+			int rowCount2 = 0;
+			double price2 = 0.0;
+			
+			for(int i = 0; i < Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)); i++)
+			{
+				rowCount2++;
+				if(rowCount2 == Integer.parseInt(pro.fetchData("row_num", rowCount2, 0)))
+				{
+					intValues[0] = Integer.parseInt(pro.fetchData("product_id", rowCount2, 0));
+					sValues[0] = pro.fetchData("product_name", rowCount2, 0);
+					sValues[1] = pro.fetchData("descript", rowCount2, 0);
+					intValues[1] = Integer.parseInt(pro.fetchData("quantity", rowCount2, 0));
+					price2 = Double.parseDouble(pro.fetchData("price", rowCount2, 0));
+					sValues[2] = pro.fetchData("supplier", rowCount2, 0);
+					intValues[2] = Integer.parseInt(pro.fetchData("exp_year", rowCount2, 0));
+					intValues[3] = Integer.parseInt(pro.fetchData("exp_month", rowCount2, 0));
+					intValues[4] = Integer.parseInt(pro.fetchData("exp_day", rowCount2, 0));
+				}
+				
+				drugs.add(new Drug(intValues[0], sValues[0], sValues[1],
+						intValues[1], price2, sValues[2], intValues[2], 
+						intValues[3], intValues[4]));
+			}
+		});
+		
 		HBox topSearch = new HBox(5);
 		topSearch.setPadding(new Insets(5, 5, 5, 5));
-		topSearch.getChildren().addAll(searchDropDown, searchInput);
+		topSearch.getChildren().addAll(searchDropDown, searchInput, refresh);
 				
 		HBox hBox = new HBox();
 		hBox.setPadding(new Insets(10, 10, 10, 10));
