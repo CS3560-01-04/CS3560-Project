@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
 
 import java.sql.Connection;
@@ -29,7 +30,7 @@ public class Main extends Application {
 
 	Stage window;
 	Scene login, productPage, supplierPage, customerPage, addProduct, addSupplier, addCustomer,
-		editProduct, editSupplier, editCustomer;
+		viewProduct, viewSupplier, viewCustomer;
 	Button submitBtn;
 	TableView<Drug> table = new TableView<>();
 	TableView<Supplier> table2 = new TableView<>();
@@ -327,7 +328,12 @@ public class Main extends Application {
 				return false;
             	});
             });
-        
+		
+		ChoiceBox<String> supplierDropDown = new ChoiceBox<String>();
+		supplierDropDown.setValue(pro.fetchData("supplier_name", 1, -1));
+		for(int i = 0; i < Integer.parseInt(pro.fetchData("COUNT(*)", -1, -1)); i++)
+			supplierDropDown.getItems().add(pro.fetchData("supplier_name", i, -1));
+		
 		Stage addStage = new Stage();
 		
 		//Buttons to add or delete drugs
@@ -341,14 +347,15 @@ public class Main extends Application {
 					(Validator.validation("Integer", drugExpdayInput.getText()))) {
 						drugs.add(new Drug(Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(),
 								drugDescriptionInput.getText(), Integer.parseInt(drugQuantityInput.getText()), 
-								Double.parseDouble(drugPriceInput.getText()), drugSupplierInput.getText(),
+								Double.parseDouble(drugPriceInput.getText()), supplierDropDown.getValue(),
 								Integer.parseInt(drugExpyearInput.getText()), Integer.parseInt(drugExpmonthInput.getText()),
 								Integer.parseInt(drugExpdayInput.getText())));
 						
 						Main add = new Main();
-						add.addData(Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)) + 1, Integer.parseInt(drugIDInput.getText()), drugNameInput.getText(), drugDescriptionInput.getText(),
+						add.addData(Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)) + 1, Integer.parseInt(drugIDInput.getText()), 
+								drugNameInput.getText(), drugDescriptionInput.getText(),
 								Double.parseDouble(drugPriceInput.getText()), Integer.parseInt(drugQuantityInput.getText()),
-								drugSupplierInput.getText(), Integer.parseInt(drugExpyearInput.getText()),
+								supplierDropDown.getValue(), Integer.parseInt(drugExpyearInput.getText()),
 								Integer.parseInt(drugExpmonthInput.getText()), Integer.parseInt(drugExpdayInput.getText()));
 						
 						drugIDInput.clear();
@@ -408,7 +415,7 @@ public class Main extends Application {
 				GridPane.setConstraints(quantityLabel, 0, 4);
 				GridPane.setConstraints(drugQuantityInput, 1, 4);
 				GridPane.setConstraints(supplierLabel, 0, 5);
-				GridPane.setConstraints(drugSupplierInput, 1, 5);
+				GridPane.setConstraints(supplierDropDown, 1, 5);
 				GridPane.setConstraints(yearLabel, 0, 6);
 				GridPane.setConstraints(drugExpyearInput, 1, 6);
 				GridPane.setConstraints(monthLabel, 0, 7);
@@ -422,7 +429,7 @@ public class Main extends Application {
 												quantityLabel, supplierLabel, yearLabel,
 												monthLabel, dayLabel, drugIDInput, drugNameInput, 
 												drugDescriptionInput, drugPriceInput, drugQuantityInput,
-												drugSupplierInput, drugExpyearInput, drugExpmonthInput, 
+												supplierDropDown, drugExpyearInput, drugExpmonthInput, 
 												drugExpdayInput, addButton, cancelButton);
 				
 				addProduct = new Scene(addGrid, 300, 400);
@@ -433,15 +440,15 @@ public class Main extends Application {
 		            addStage.show();
 		        });
 				
-		        Stage editStage = new Stage();
+		        Stage viewStage = new Stage();
 				
-				Button cancelEditButton = new Button("Cancel");
-				cancelEditButton.setOnAction(e -> {editStage.close();});
+				Button cancelViewButton = new Button("Cancel");
+				cancelViewButton.setOnAction(e -> {viewStage.close();});
 				
-				GridPane editGrid = new GridPane();
-				editGrid.setPadding(new Insets(20, 20, 20, 20));
-				editGrid.setVgap(30);
-				editGrid.setHgap(30);
+				GridPane viewGrid = new GridPane();
+				viewGrid.setPadding(new Insets(20, 20, 20, 20));
+				viewGrid.setVgap(20);
+				viewGrid.setHgap(30);
 				
 				Label idDrugLabel = new Label("");
 				Label nameDrugLabel = new Label("");
@@ -454,28 +461,6 @@ public class Main extends Application {
 				Label dayDrugLabel = new Label("");
 				
 				descDrugLabel.setWrapText(true);
-				
-				Button editButton = new Button("Edit Data");
-				editButton.setOnAction(e -> {
-					GridPane.setConstraints(drugIDInput, 1, 0);
-					GridPane.setConstraints(drugNameInput, 1, 1);
-					GridPane.setConstraints(drugDescriptionInput, 1, 2);
-					GridPane.setConstraints(drugPriceInput, 1, 3);
-					GridPane.setConstraints(drugQuantityInput, 1, 4);
-					GridPane.setConstraints(drugSupplierInput, 1, 5);
-					GridPane.setConstraints(drugExpyearInput, 1, 6);
-					GridPane.setConstraints(drugExpmonthInput, 1, 7);
-					GridPane.setConstraints(drugExpdayInput, 1, 8);
-					
-					editGrid.getChildren().addAll(drugIDInput, drugNameInput, 
-							drugDescriptionInput, drugPriceInput, drugQuantityInput,
-							drugSupplierInput, drugExpyearInput, drugExpmonthInput, 
-							drugExpdayInput);
-					editProduct = new Scene(editGrid, 500, 700);
-					editStage.setTitle("Edit Product");
-					editStage.setScene(editProduct);
-		            editStage.show();
-				});
 				
 				GridPane.setConstraints(idLabel, 0, 0);
 				GridPane.setConstraints(idDrugLabel, 1, 0);
@@ -495,17 +480,16 @@ public class Main extends Application {
 				GridPane.setConstraints(monthDrugLabel, 1, 7);
 				GridPane.setConstraints(dayLabel, 0, 8);
 				GridPane.setConstraints(dayDrugLabel, 1, 8);
-				GridPane.setConstraints(editButton, 1, 9);
-				GridPane.setConstraints(cancelEditButton, 1, 10);
+				GridPane.setConstraints(cancelViewButton, 0, 9);
 				
-				editGrid.getChildren().addAll(idLabel, nameLabel, descLabel, 
+				viewGrid.getChildren().addAll(idLabel, nameLabel, descLabel, 
 						priceLabel, quantityLabel, supplierLabel, yearLabel,
 						monthLabel, dayLabel, idDrugLabel, nameDrugLabel, descDrugLabel,
 						priceDrugLabel, quantityDrugLabel, supplierDrugLabel, yearDrugLabel,
-						monthDrugLabel, dayDrugLabel, editButton, cancelEditButton);
+						monthDrugLabel, dayDrugLabel, cancelViewButton);
 						
 				
-				editProduct = new Scene(editGrid, 500, 700);
+				viewProduct = new Scene(viewGrid, 550, 400);
 				
 		table.setRowFactory( tv -> {
 		    TableRow<Drug> drugRow = new TableRow<>();
@@ -522,10 +506,10 @@ public class Main extends Application {
 					yearDrugLabel.setText(String.valueOf(rowData.getExpyear()));
 					monthDrugLabel.setText(String.valueOf(rowData.getExpmonth()));
 					dayDrugLabel.setText(String.valueOf(rowData.getExpday()));
-		            
-		            editStage.setTitle("Edit Product");
-		            editStage.setScene(editProduct);
-		            editStage.show();
+
+		            viewStage.setTitle("View Product");
+		            viewStage.setScene(viewProduct);
+		            viewStage.show();
 		        }
 		    });
 		    return drugRow;
@@ -764,6 +748,56 @@ public class Main extends Application {
 		            addSupStage.show();
 		        });
 		        
+		        Stage viewSupStage = new Stage();
+				
+				Button cancelViewSupButton = new Button("Cancel");
+				cancelViewSupButton.setOnAction(e -> {viewSupStage.close();});
+				
+				GridPane viewSupGrid = new GridPane();
+				viewSupGrid.setPadding(new Insets(20, 20, 20, 20));
+				viewSupGrid.setVgap(20);
+				viewSupGrid.setHgap(30);
+				
+				Label supIdLabel = new Label("");
+				Label supNameLabel = new Label("");
+				Label supEmailLabel = new Label("");
+				Label supPhoneLabel = new Label("");
+				
+				GridPane.setConstraints(idSupLabel, 0, 0);
+				GridPane.setConstraints(supIdLabel, 1, 0);
+				GridPane.setConstraints(nameSupLabel, 0, 1);
+				GridPane.setConstraints(supNameLabel, 1, 1);
+				GridPane.setConstraints(emailLabel, 0, 2);
+				GridPane.setConstraints(supEmailLabel, 1, 2);
+				GridPane.setConstraints(phoneLabel, 0, 3);
+				GridPane.setConstraints(supPhoneLabel, 1, 3);
+				GridPane.setConstraints(cancelViewSupButton, 0, 4);
+				
+				viewSupGrid.getChildren().addAll(idSupLabel, nameSupLabel, emailLabel, 
+						phoneLabel, supIdLabel, supNameLabel, supEmailLabel,
+						supPhoneLabel, cancelViewSupButton);
+						
+				
+				viewSupplier = new Scene(viewSupGrid, 550, 200);
+				
+		table2.setRowFactory( tv -> {
+		    TableRow<Supplier> SupRow = new TableRow<>();
+		    SupRow.setOnMouseClicked(event -> {
+		        if (event.getClickCount() == 2 && (! SupRow.isEmpty()) ) {
+		            Supplier rowSupData = SupRow.getItem();
+		            
+		            supIdLabel.setText(String.valueOf(rowSupData.getId()));
+					supNameLabel.setText(rowSupData.getName());
+					supEmailLabel.setText(rowSupData.getEmail());
+					supPhoneLabel.setText(String.valueOf(rowSupData.getPhone()));
+
+		            viewSupStage.setTitle("Edit Product");
+		            viewSupStage.setScene(viewSupplier);
+		            viewSupStage.show();
+		        }
+		    });
+		    return SupRow;
+		});
 		        
 		Button refreshSup = new Button("Refresh");
 		refreshSup.setOnAction(e -> {
@@ -1025,7 +1059,66 @@ public class Main extends Application {
 		            addCusStage.setScene(addCustomer);
 		            addCusStage.show();
 		        });
-		        
+		
+		        Stage viewCusStage = new Stage();
+				
+				Button cancelViewCusButton = new Button("Cancel");
+				cancelViewCusButton.setOnAction(e -> {viewCusStage.close();});
+				
+				GridPane viewCusGrid = new GridPane();
+				viewCusGrid.setPadding(new Insets(20, 20, 20, 20));
+				viewCusGrid.setVgap(20);
+				viewCusGrid.setHgap(30);
+				
+				Label idCusLabel = new Label("");
+				Label fnameLabel = new Label("");
+				Label lnameLabel = new Label("");
+				Label emailCusLabel = new Label("");
+				Label phoneCusLabel = new Label("");
+				Label prescriptionLabel = new Label("");
+				
+				GridPane.setConstraints(idCusLabel, 1, 0);
+				GridPane.setConstraints(cusIdLabel, 0, 0);
+				GridPane.setConstraints(fnameLabel, 1, 1);
+				GridPane.setConstraints(FnameLabel, 0, 1);
+				GridPane.setConstraints(lnameLabel, 1, 2);
+				GridPane.setConstraints(LnameLabel, 0, 2);
+				GridPane.setConstraints(emailCusLabel, 1, 3);
+				GridPane.setConstraints(cusEmailLabel, 0, 3);
+				GridPane.setConstraints(phoneCusLabel, 1, 4);
+				GridPane.setConstraints(cusPhoneLabel, 0, 4);
+				GridPane.setConstraints(prescriptionLabel, 1, 5);
+				GridPane.setConstraints(PrescriptionLabel, 0, 5);
+				GridPane.setConstraints(cancelViewCusButton, 0, 6);
+				
+				viewCusGrid.getChildren().addAll(idCusLabel, fnameLabel, lnameLabel, 
+						emailCusLabel, phoneCusLabel, prescriptionLabel, cusIdLabel, 
+						FnameLabel, LnameLabel, cusEmailLabel, cusPhoneLabel, 
+						PrescriptionLabel, cancelViewCusButton);
+						
+				
+				viewCustomer = new Scene(viewCusGrid, 450, 400);
+				
+		table3.setRowFactory( tv -> {
+		    TableRow<Customer> cusRow = new TableRow<>();
+		    cusRow.setOnMouseClicked(event -> {
+		        if (event.getClickCount() == 2 && (! cusRow.isEmpty()) ) {
+		            Customer rowCusData = cusRow.getItem();
+		            
+		            idCusLabel.setText(String.valueOf(rowCusData.getId()));
+					fnameLabel.setText(rowCusData.getFname());
+					lnameLabel.setText(rowCusData.getLname());
+					emailCusLabel.setText(String.valueOf(rowCusData.getEmail()));
+					phoneCusLabel.setText(String.valueOf(rowCusData.getPhone()));
+					prescriptionLabel.setText(rowCusData.getPrescription());
+					
+		            viewCusStage.setTitle("View Customer");
+		            viewCusStage.setScene(viewCustomer);
+		            viewCusStage.show();
+		        }
+		    });
+		    return cusRow;
+		});
 		        
 		Button refreshCustomers = new Button("Refresh");
 		refreshCustomers.setOnAction(e -> {
@@ -1138,27 +1231,27 @@ public class Main extends Application {
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate("USE cs3560;");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM product ORDER BY row_num");
-			
-			if(column.equals("COUNT(*)") && row == -1 && id == 0) //if row = -1, count amount of rows
+			//if row = -1, count amount of rows
+			if(column.equals("COUNT(*)") && row == -1 && id == 0) 			//id = 0 -> Collect data from product
 				rs = stmt.executeQuery("SELECT COUNT(*) FROM product;");
-			else if(column.equals("COUNT(*)") && row == -1 && id == -1)
+			else if(column.equals("COUNT(*)") && row == -1 && id == -1)		//id = 1 -> Collect data from supplier
 				rs = stmt.executeQuery("SELECT COUNT(*) FROM supplier;");
-			else if(column.equals("COUNT(*)") && row == -1 && id == -2)
+			else if(column.equals("COUNT(*)") && row == -1 && id == -2)		//id = 2 -> collect data from customer
 				rs = stmt.executeQuery("SELECT COUNT(*) FROM customer;");
 			
 			else if(column.equals("row_num") && row == -2)
-				rs = stmt.executeQuery("SELECT row_num FROM product WHERE product_id = " + id);
+				rs = stmt.executeQuery("SELECT row_num FROM product WHERE product_id = " + id); //fetch product_id
 			else if(column.equals("row_num") && row == -3)
-				rs = stmt.executeQuery("SELECT row_num FROM supplier WHERE supplier_id = " + id);
+				rs = stmt.executeQuery("SELECT row_num FROM supplier WHERE supplier_id = " + id); //fetch supplier_id
 			else if(column.equals("row_num") && row == -4)
-				rs = stmt.executeQuery("SELECT row_num FROM customer WHERE customer_id = " + id);
-			else if(id == -1)
-				
-				rs = stmt.executeQuery("SELECT " + column + " FROM supplier WHERE row_num = " + row);
+				rs = stmt.executeQuery("SELECT row_num FROM customer WHERE customer_id = " + id); //fetch customer_id
+			
+			else if(id == -1)	
+				rs = stmt.executeQuery("SELECT " + column + " FROM supplier WHERE row_num = " + row); //fetch certain supplier index
 			else if(id == -2)
-				rs = stmt.executeQuery("SELECT " + column + " FROM customer WHERE row_num = " + row);
+				rs = stmt.executeQuery("SELECT " + column + " FROM customer WHERE row_num = " + row); //fetch certain customer index
 			else
-				rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE row_num = " + row);
+				rs = stmt.executeQuery("SELECT " + column + " FROM product WHERE row_num = " + row); //fetch certain product index
 			
 			while(rs.next())
 			{
