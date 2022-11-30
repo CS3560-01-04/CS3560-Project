@@ -28,7 +28,8 @@ import java.util.logging.Logger;
 public class Main extends Application {
 
 	Stage window;
-	Scene login, productPage, supplierPage, customerPage, addProduct, addSupplier, addCustomer;
+	Scene login, productPage, supplierPage, customerPage, addProduct, addSupplier, addCustomer,
+		editProduct, editSupplier, editCustomer;
 	Button submitBtn;
 	TableView<Drug> table = new TableView<>();
 	TableView<Supplier> table2 = new TableView<>();
@@ -423,7 +424,7 @@ public class Main extends Application {
 												drugDescriptionInput, drugPriceInput, drugQuantityInput,
 												drugSupplierInput, drugExpyearInput, drugExpmonthInput, 
 												drugExpdayInput, addButton, cancelButton);
-
+				
 				addProduct = new Scene(addGrid, 300, 400);
 		        Button addDrug = new Button("Add New Product");
 		        addDrug.setOnAction(e -> {	
@@ -431,7 +432,104 @@ public class Main extends Application {
 		            addStage.setScene(addProduct);
 		            addStage.show();
 		        });
-		        
+				
+		        Stage editStage = new Stage();
+				
+				Button cancelEditButton = new Button("Cancel");
+				cancelEditButton.setOnAction(e -> {editStage.close();});
+				
+				GridPane editGrid = new GridPane();
+				editGrid.setPadding(new Insets(20, 20, 20, 20));
+				editGrid.setVgap(30);
+				editGrid.setHgap(30);
+				
+				Label idDrugLabel = new Label("");
+				Label nameDrugLabel = new Label("");
+				Label descDrugLabel = new Label("");
+				Label priceDrugLabel = new Label("");
+				Label quantityDrugLabel = new Label("");
+				Label supplierDrugLabel = new Label("");
+				Label yearDrugLabel = new Label("");
+				Label monthDrugLabel = new Label("");
+				Label dayDrugLabel = new Label("");
+				
+				descDrugLabel.setWrapText(true);
+				
+				Button editButton = new Button("Edit Data");
+				editButton.setOnAction(e -> {
+					GridPane.setConstraints(drugIDInput, 1, 0);
+					GridPane.setConstraints(drugNameInput, 1, 1);
+					GridPane.setConstraints(drugDescriptionInput, 1, 2);
+					GridPane.setConstraints(drugPriceInput, 1, 3);
+					GridPane.setConstraints(drugQuantityInput, 1, 4);
+					GridPane.setConstraints(drugSupplierInput, 1, 5);
+					GridPane.setConstraints(drugExpyearInput, 1, 6);
+					GridPane.setConstraints(drugExpmonthInput, 1, 7);
+					GridPane.setConstraints(drugExpdayInput, 1, 8);
+					
+					editGrid.getChildren().addAll(drugIDInput, drugNameInput, 
+							drugDescriptionInput, drugPriceInput, drugQuantityInput,
+							drugSupplierInput, drugExpyearInput, drugExpmonthInput, 
+							drugExpdayInput);
+					editProduct = new Scene(editGrid, 500, 700);
+					editStage.setTitle("Edit Product");
+					editStage.setScene(editProduct);
+		            editStage.show();
+				});
+				
+				GridPane.setConstraints(idLabel, 0, 0);
+				GridPane.setConstraints(idDrugLabel, 1, 0);
+				GridPane.setConstraints(nameLabel, 0, 1);
+				GridPane.setConstraints(nameDrugLabel, 1, 1);
+				GridPane.setConstraints(descLabel, 0, 2);
+				GridPane.setConstraints(descDrugLabel, 1, 2);
+				GridPane.setConstraints(priceLabel, 0, 3);
+				GridPane.setConstraints(priceDrugLabel, 1, 3);
+				GridPane.setConstraints(quantityLabel, 0, 4);
+				GridPane.setConstraints(quantityDrugLabel, 1, 4);
+				GridPane.setConstraints(supplierLabel, 0, 5);
+				GridPane.setConstraints(supplierDrugLabel, 1, 5);
+				GridPane.setConstraints(yearLabel, 0, 6);
+				GridPane.setConstraints(yearDrugLabel, 1, 6);
+				GridPane.setConstraints(monthLabel, 0, 7);
+				GridPane.setConstraints(monthDrugLabel, 1, 7);
+				GridPane.setConstraints(dayLabel, 0, 8);
+				GridPane.setConstraints(dayDrugLabel, 1, 8);
+				GridPane.setConstraints(editButton, 1, 9);
+				GridPane.setConstraints(cancelEditButton, 1, 10);
+				
+				editGrid.getChildren().addAll(idLabel, nameLabel, descLabel, 
+						priceLabel, quantityLabel, supplierLabel, yearLabel,
+						monthLabel, dayLabel, idDrugLabel, nameDrugLabel, descDrugLabel,
+						priceDrugLabel, quantityDrugLabel, supplierDrugLabel, yearDrugLabel,
+						monthDrugLabel, dayDrugLabel, editButton, cancelEditButton);
+						
+				
+				editProduct = new Scene(editGrid, 500, 700);
+				
+		table.setRowFactory( tv -> {
+		    TableRow<Drug> drugRow = new TableRow<>();
+		    drugRow.setOnMouseClicked(event -> {
+		        if (event.getClickCount() == 2 && (! drugRow.isEmpty()) ) {
+		            Drug rowData = drugRow.getItem();
+		            
+		            idDrugLabel.setText(String.valueOf(rowData.getId()));
+					nameDrugLabel.setText(rowData.getName());
+					descDrugLabel.setText(rowData.getDescription());
+					priceDrugLabel.setText(String.valueOf(rowData.getPrice()));
+					quantityDrugLabel.setText(String.valueOf(rowData.getQuantity()));
+					supplierDrugLabel.setText(rowData.getSupplier());
+					yearDrugLabel.setText(String.valueOf(rowData.getExpyear()));
+					monthDrugLabel.setText(String.valueOf(rowData.getExpmonth()));
+					dayDrugLabel.setText(String.valueOf(rowData.getExpday()));
+		            
+		            editStage.setTitle("Edit Product");
+		            editStage.setScene(editProduct);
+		            editStage.show();
+		        }
+		    });
+		    return drugRow;
+		});
 		        
 		Button refresh = new Button("Refresh");
 		refresh.setOnAction(e -> {
@@ -508,7 +606,7 @@ public class Main extends Application {
 		supPhoneInput.setMaxWidth(200);
 		
 		ChoiceBox<String> searchDropDown2 = new ChoiceBox<String>();
-		searchDropDown2.getItems().addAll("Supplier ID", "Supplier Name", "Supplier Email", "Supplier Phone#");
+		searchDropDown2.getItems().addAll("Supplier ID", "Supplier Name", "Supplier Email", "Supplier Phone");
 		searchDropDown2.setValue("Supplier ID");
 		
 		TextField searchInput2 = new TextField();
@@ -584,7 +682,7 @@ public class Main extends Application {
                         if(Supplier.getEmail().toLowerCase().indexOf(lowerCase) !=-1)
                         	return true;
                         break;
-                    case "Supplier Phone#":
+                    case "Supplier Phone":
                     	if(Supplier.getPhone().indexOf(newValue) !=-1)
                         	return true;
                         break;
