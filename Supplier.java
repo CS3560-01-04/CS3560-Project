@@ -1,68 +1,58 @@
-package GUI;
+package application;
 
 public class Supplier {
 
-    private int SupplierID;
-    private String SupplierName;
-    private String merchandise;
-    private int Quantity;
-    private int Price;
+    private int id;
+    private String name;
+    private String email;
+    private String phone;
 
     public Supplier() {
-        this.SupplierID = 0;
-        this.SupplierName = ""; 
-        this.merchandise = "";
-        this.Quantity = 0;
-        this.Price = 0;
+        this.id = 0;
+        this.name = "";
+        this.email = "";
+        this.phone = "";
     }
 
-    public Supplier(int SupplierID, String SupplierName, String merchandise, int Quantity, 
-            int Price) {
-        this.SupplierID = SupplierID;
-        this.SupplierName = SupplierName;
-        this.merchandise = merchandise;
-        this.Quantity = Quantity;
-        this.Price = Price;
+    public Supplier(int id, String name, String email, String phone) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
     }
 
-    public int getSupplierID() {
-        return SupplierID;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setSupplierID(int supplierID) {
-        SupplierID = supplierID;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getSupplierName() {
-        return SupplierName;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setSupplierName(String supplierName) {
-        SupplierName = supplierName;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getMerchandise() {
-        return merchandise;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setMerchandise(String merchandise) {
-        this.merchandise = merchandise;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public int getQuantity() {
-        return Quantity;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public void setQuantity(int quantity) {
-        Quantity = quantity;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    public int getPrice() {
-        return Price;
-    }
-
-    public void setPrice(int price) {
-        Price = price;
-    }
+    
 
 }
