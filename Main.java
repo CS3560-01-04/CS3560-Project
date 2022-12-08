@@ -58,8 +58,8 @@ public class Main extends Application {
 	public void start(Stage arg0) throws Exception {
 		
 		//test username and password for the sake of demonstration, will be removed later
-		String testUsrname = "1";
-		String testPasswrd = "1";
+		String testUsrname = "Brandon";
+		String testPasswrd = "bruhmoment";
 		
 		window = arg0;
 		window.setTitle("Login Screen");
@@ -81,7 +81,7 @@ public class Main extends Application {
 		Label usernameLabel = new Label("Username: ");
 		TextField usernameInput = new TextField();
 		Label passLabel = new Label("Password: ");
-		TextField passInput = new TextField();
+		PasswordField passInput = new PasswordField();
 		
 		//setting where our text fields and labels will be on the grid pane.
 		GridPane.setConstraints(usernameLabel, 0, 0);
@@ -126,6 +126,7 @@ public class Main extends Application {
 				window.setTitle("Products");
 				window.setScene(productPage);
 				window.show();
+				lowStock();
 			}
 		});
 		
@@ -294,7 +295,6 @@ public class Main extends Application {
 					intValues[1], price, sValues[2], intValues[2], 
 					intValues[3], intValues[4]));
 		}
-		
 		
 		FilteredList<Drug> filteredList = new FilteredList<>(drugs);//Pass the data to a filtered list
 		table.setEditable(true);
@@ -541,6 +541,7 @@ public class Main extends Application {
 						intValues[1], price2, sValues[2], intValues[2], 
 						intValues[3], intValues[4]));
 			}
+			lowStock();
 		});
 		
 		/*
@@ -637,7 +638,6 @@ public class Main extends Application {
 			
 			suppliers.add(new Supplier(intValues[0], sValues[0], sValues[1], sValues[2]));
 		}
-		
 		
 		FilteredList<Supplier> filteredList2 = new FilteredList<>(suppliers);//Pass the data to a filtered list
 		table2.setEditable(true);
@@ -913,7 +913,7 @@ public class Main extends Application {
 		});
 		
 		ChoiceBox<String> searchDropDown3 = new ChoiceBox<String>();
-		searchDropDown3.getItems().addAll("Customer ID", "Name", "Email", "Phone", "Precription");
+		searchDropDown3.getItems().addAll("Customer ID", "Name", "Email", "Phone", "Prescription");
 		searchDropDown3.setValue("Customer ID");
 		
 		TextField searchInput3 = new TextField();
@@ -1217,6 +1217,45 @@ public class Main extends Application {
 		boolean answer = ConfirmBox.display("Exit Page", "Are you sure you'd like to close this page?");
 		if(answer)
 			window.close();
+	}
+	
+	void lowStock()
+	{
+		Main pro = new Main();
+		String lowProduct = "";
+		int productCount = 0;
+		
+		for(int i = 1; i <= Integer.parseInt(pro.fetchData("COUNT(*)", -1, 0)); i++)
+			if(Integer.parseInt(pro.fetchData("quantity", i, 0)) <= 10)
+			{
+				lowProduct += pro.fetchData("product_name", i, 0) + " (Product ID: " + 
+											pro.fetchData("product_id", i, 0) + ") is low on stock. Contact " + 
+											pro.fetchData("supplier", i, 0) + " for resupply.\n";
+				productCount++;
+			}
+		
+		if(productCount > 0)
+		{
+			Stage window = new Stage();
+			
+			window.initModality(Modality.APPLICATION_MODAL);
+			window.setTitle("LOW STOCK");
+			window.setMinWidth(533);
+			window.setMinHeight(300);
+			
+			Label label = new Label();
+			label.setText(lowProduct);
+			Button closeButton = new Button("ok");
+			closeButton.setOnAction(e -> window.close());
+			
+			VBox layout = new VBox(20);
+			layout.getChildren().addAll(label, closeButton);
+			layout.setAlignment(Pos.CENTER);
+			
+			Scene scene = new Scene(layout);
+			window.setScene(scene);
+			window.showAndWait();
+		}
 	}
 	
 	String fetchData(String column, int row, int id)
